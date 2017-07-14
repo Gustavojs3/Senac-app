@@ -9,8 +9,7 @@ $(document).ready(function () {
 
     inicializarDados();
 });
-
-$("#salvarBtn").click(function () {
+function dadosProfessor() {
     var professor = {
         nome: $("#nome").val().trim(),
         idade: parseInt($("#idade").val().trim()),
@@ -20,23 +19,14 @@ $("#salvarBtn").click(function () {
         disponibilidadeInicio: $("#dataInicio").val(),
         disponibilidadeFim: $("#dataFim").val()
     };
+    return professor;
+}
 
+$("#salvarBtn").click(function () {
+    var professor = dadosProfessor();
     var valido = validar(professor);
     if (valido) {
         adicionarProfessorNaTabela(professor);
-        // chamar o back-end
-        $.ajax({
-        type: "POST",
-        url: "http://localhost:3000/professor",
-        data: JSON.stringify(professor),
-        success: function(dados, status) {
-            console.log(dados);
-            console.log(status);
-        },
-        contentType: "application/json",
-        dataType: "json"
-    });
-    
         Materialize.toast("Sucesso!", 3000);
         $(".modal").modal("close");
         $("#cadastroProfessor").trigger("reset");
@@ -85,32 +75,36 @@ $("#removerBtn").click(function () {
 });
 
 function inicializarDados() {
-    $.get("http://localhost:3000/professor", function (dados) {
-
-        var listaProfessores = dados;
-
-        listaProfessores.forEach(function (professor) {
-            adicionarProfessorNaTabela(professor);
-
-        });
+    var listaProfessores = JSON.parse(dados);
+    listaProfessores.forEach(function (professor) {
+        adicionarProfessorNaTabela(professor);
     });
 }
 
 $("#editarBtn").click(function () {
+    var professor = dadosProfessor();
     var selecionado = $("input[name=edicao]:checked");
     // var selec = $("#corpoTabela").children();
 
     if (selecionado.val()) {
         var selec = selecionado.parent().parent()[0].children;
-        var professor = {
-            nome: $("#nome").val(selec[1].textContent),
-            idade: parseInt($("#idade").val(selec[2].textContent)),
-            genero: $("input[name=genero]:checked").val(selec[3].textContent),
-            formacao: $("#formacao").val(selec[4].textContent),
-            areaAtuacao: $("#areaAtuacao").val(selec[5].textContent),
-            disponibilidadeInicio: $("#dataInicio").val(selec[6].textContent),
-            disponibilidadeFim: $("#dataFim").val(selec[7].textContent)
-        };
+        professor.nome.val(selec[1]);
+        // professor.idade.val(selec[2].textContent),
+        // professor.genero.val(selec[3].textContent),
+        // professor.formacao.val(selec[4].textContent),
+        // professor.areaAtuacao.val(selec[5].textContent),
+        // professor.disponibilidadeInicio.val(selec[6].textContent),
+        // professor.disponibilidadeFim.val(selec[7].textContent),
+
+        // var professor = {
+        //     nome: $("#nome").val(selec[1].textContent),
+        //     idade: parseInt($("#idade").val(selec[2].textContent)),
+        //     genero: $("input[name=genero]:checked").val(selec[3].textContent),
+        //     formacao: $("#formacao").val(selec[4].textContent),
+        //     areaAtuacao: $("#areaAtuacao").val(selec[5].textContent),
+        //     disponibilidadeInicio: $("#dataInicio").val(selec[6].textContent),
+        //     disponibilidadeFim: $("#dataFim").val(selec[7].textContent)
+        // };
         $(".modal").modal("open");
         $("#idade, #dataInicio, #dataFim, #nome").focus();
         // Materialize.toast("Editado com Sucesso!",5000);
